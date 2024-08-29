@@ -1,37 +1,40 @@
-import { Button } from "antd";
-import { FieldValues, useForm } from "react-hook-form";
+import { Button, Row } from "antd";
+import { FieldValues } from "react-hook-form";
 import { useLoginMutation } from "../redux/features/auth/authApi";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/features/auth/authSlice";
 import { verifyToken } from "../utils/verifyToken";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import LoginForm from "../components/form/LoginForm";
+import LoginInput from "../components/form/LoginInput";
 
 type TUser = {
   id: string;
   username: string;
   role: string;
-}
+};
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { register, handleSubmit } = useForm({
-    defaultValues: {
-      id: "A-0001",
-      password: "admin123",
-    },
-  });
+
+  const defaultValues = {
+    userId: "A-0001",
+    password: "admin123",
+  };
 
   const [login] = useLoginMutation();
 
-  const handleLogin = async (data: FieldValues) => {
+  const onSubmit = async (data: FieldValues) => {
+    console.log(data);
     const toastId = toast.loading("logging in");
     try {
       const userInfo = {
-        id: data.id,
+        id: data.userId,
         password: data.password,
       };
+      console.log('user info', userInfo);
       const res = await login(userInfo).unwrap();
       const user = verifyToken(res.data.accessToken) as TUser;
       dispatch(setUser({ user: user, token: res.data.accessToken }));
@@ -43,13 +46,13 @@ const Login = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(handleLogin)}>
-      <label htmlFor="id">ID:</label>
-      <input type="text" id="id" {...register("id")} />
-      <label htmlFor="password">Password</label>
-      <input type="text" id="password" {...register("password")} />
-      <Button htmlType="submit">Login</Button>
-    </form>
+    <Row justify="center" align="middle" style={{ height: "100vh" }}>
+      <LoginForm onSubmit={onSubmit} defaultValues={defaultValues}>
+        <LoginInput type="text" name="userId" label="ID:" />
+        <LoginInput type="text" name="password" label="Password" />
+        <Button htmlType="submit">Login</Button>
+      </LoginForm>
+    </Row>
   );
 };
 
