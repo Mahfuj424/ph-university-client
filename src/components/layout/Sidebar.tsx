@@ -4,6 +4,15 @@ import Sider from "antd/es/layout/Sider";
 import { Menu } from "antd";
 import { facultyPaths } from "../../routes/faculty.routes";
 import { studentPaths } from "../../routes/student.routes";
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "../../redux/features/auth/authSlice";
+
+type TUser = {
+  exp: number;
+  iat: number;
+  role: string;
+  userId: string;
+};
 
 const userRole = {
   ADMIN: "admin",
@@ -12,10 +21,10 @@ const userRole = {
 };
 
 const Sidebar = () => {
-  const role = "admin";
+  const user = useSelector(selectCurrentUser) as TUser;
   let sidebarItems;
 
-  switch (role) {
+  switch (user.role) {
     case userRole.ADMIN:
       sidebarItems = SidebarRoutesGenerator(adminPaths, userRole.ADMIN);
       break;
@@ -35,7 +44,6 @@ const Sidebar = () => {
       breakpoint="lg"
       collapsedWidth="0"
       onBreakpoint={(broken) => {
-        console.log(broken);
       }}
       onCollapse={(collapsed, type) => {
         console.log(collapsed, type);

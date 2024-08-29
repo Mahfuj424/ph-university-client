@@ -7,6 +7,12 @@ import { verifyToken } from "../utils/verifyToken";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
+type TUser = {
+  id: string;
+  username: string;
+  role: string;
+}
+
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -27,7 +33,7 @@ const Login = () => {
         password: data.password,
       };
       const res = await login(userInfo).unwrap();
-      const user = verifyToken(res.data.accessToken);
+      const user = verifyToken(res.data.accessToken) as TUser;
       dispatch(setUser({ user: user, token: res.data.accessToken }));
       navigate(`/${user.role}/dashboard`);
       toast.success("user loging successfully", { id: toastId });
